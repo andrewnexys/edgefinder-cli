@@ -113,7 +113,7 @@ Local install:
 openclaw plugins install /absolute/path/to/openclaw-plugin
 ```
 
-After npm publication, OpenClaw can also install it by package name:
+OpenClaw can also install it by package name:
 
 ```bash
 openclaw plugins install @edgefinder/openclaw-plugin
