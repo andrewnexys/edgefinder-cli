@@ -103,6 +103,22 @@ Add to your MCP client config:
 | `analyze_position` | Analyze a portfolio position -- searches by team/title, runs AI analysis with hold/exit advice, entry assessment, or win/loss post-mortem |
 | `get_status` | Account and subscription status |
 
+## OpenClaw Plugin
+
+This repo also includes a local-installable OpenClaw plugin package in [`openclaw-plugin/`](./openclaw-plugin).
+
+Local install:
+
+```bash
+openclaw plugins install /absolute/path/to/openclaw-plugin
+```
+
+After npm publication, OpenClaw can also install it by package name:
+
+```bash
+openclaw plugins install @edgefinder/openclaw-plugin
+```
+
 ## License
 
 MIT

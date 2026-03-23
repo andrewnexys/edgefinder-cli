@@ -1,0 +1,14 @@
+{
+  "id": "edgefinder-cli",
+  "name": "EdgeFinder CLI",
+  "description": "Bundles the EdgeFinder sports-analysis skill for OpenClaw.",
+  "version": "0.1.0",
+  "skills": [
+    "skills/edgefinder-cli"
+  ],
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {}
+  }
+}

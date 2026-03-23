@@ -1,0 +1,42 @@
+{
+  "name": "@edgefinder/openclaw-plugin",
+  "version": "0.1.0",
+  "description": "OpenClaw plugin that bundles the EdgeFinder CLI skill.",
+  "type": "module",
+  "files": [
+    "index.js",
+    "openclaw.plugin.json",
+    "skills",
+    "README.md"
+  ],
+  "scripts": {
+    "pack:dry-run": "npm pack --dry-run"
+  },
+  "keywords": [
+    "openclaw",
+    "plugin",
+    "edgefinder",
+    "sports",
+    "nfl",
+    "nba"
+  ],
+  "license": "MIT",
+  "author": "EdgeFinder <support@edgefinder.io>",
+  "homepage": "https://github.com/andrewnexys/edgefinder-cli",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/andrewnexys/edgefinder-cli.git",
+    "directory": "openclaw-plugin"
+  },
+  "bugs": {
+    "url": "https://github.com/andrewnexys/edgefinder-cli/issues"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "openclaw": {
+    "extensions": [
+      "./index.js"
+    ]
+  }
+}
