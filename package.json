@@ -1,6 +1,6 @@
 {
   "name": "@edgefinder/cli",
-  "version": "0.1.11",
+  "version": "0.1.13",
   "description": "EdgeFinder CLI and MCP server for sports analysis",
   "type": "module",
   "bin": {
