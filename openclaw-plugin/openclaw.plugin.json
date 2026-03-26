@@ -9,6 +9,17 @@
   "configSchema": {
     "type": "object",
     "additionalProperties": false,
-    "properties": {}
+    "properties": {
+      "EDGEFINDER_API_KEY": {
+        "type": "string",
+        "description": "EdgeFinder API key (ef_live_...). Get yours at edgefinder.io."
+      }
+    }
+  },
+  "uiHints": {
+    "EDGEFINDER_API_KEY": {
+      "label": "EdgeFinder API Key",
+      "help": "Your EdgeFinder API key. Found at edgefinder.io under account settings."
+    }
   }
 }

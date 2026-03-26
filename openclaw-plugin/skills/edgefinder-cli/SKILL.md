@@ -14,9 +14,9 @@ Use this skill when the user wants NFL or NBA betting analysis, schedules, stand
 - Use the bundled wrapper script: `sh {baseDir}/scripts/run.sh ...`
 - The wrapper prefers the installed `edgefinder` binary and falls back to `npx -y @edgefinder/cli`.
 - Authenticate in one of these ways:
+  - Set `EDGEFINDER_API_KEY=ef_live_...` in your environment (recommended — add to shell profile or OpenClaw's env config).
   - Run `sh {baseDir}/scripts/run.sh login` for the interactive magic-link flow.
-  - Set `EDGEFINDER_API_KEY=ef_live_...`.
-  - Or configure the EdgeFinder CLI locally in `~/.edgefinder/config.json`.
+  - Set it via plugin config: `openclaw config set plugins.entries.edgefinder-cli.config.EDGEFINDER_API_KEY ef_live_...`
 
 ## Usage
 
@@ -47,3 +47,4 @@ sh {baseDir}/scripts/run.sh status --json
 - `sh {baseDir}/scripts/run.sh` with no subcommand starts the interactive REPL. In automated agent runs, prefer explicit subcommands.
 - CLI access requires an active paid EdgeFinder subscription. If auth is missing, `sh {baseDir}/scripts/run.sh login` will prompt for email and may open the subscription page.
 - Never print or echo the full API key back to the user.
+- After installing this skill, start a new conversation with your agent for it to take effect.
