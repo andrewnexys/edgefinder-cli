@@ -24,6 +24,7 @@ export async function startInteractiveSession(): Promise<void> {
     client,
     league: 'nfl' as League,
     conversationHistory: [],
+    threadId: null,
   }
 
   while (true) {

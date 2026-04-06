@@ -77,6 +77,7 @@ export class EdgeFinderClient {
         message: req.message,
         league: req.league || 'nfl',
         conversationHistory: req.conversationHistory || [],
+        threadId: req.threadId,
       }),
     })
   }

@@ -6,6 +6,7 @@ export interface SessionState {
   client: EdgeFinderClient
   league: League
   conversationHistory: Array<{ role: string; content: string }>
+  threadId: string | null
 }
 
 const ANSI = {
@@ -47,9 +48,11 @@ async function handleAsk(state: SessionState, question: string): Promise<string>
       message: question,
       league: state.league,
       conversationHistory: state.conversationHistory,
+      threadId: state.threadId || undefined,
     })
 
     state.conversationHistory = response.conversationHistory
+    state.threadId = response.threadId || state.threadId
 
     let output = response.response
     if (response.usage) {
@@ -148,6 +151,7 @@ function handleLeagueSwitch(state: SessionState, league: League): string {
 
 function handleClear(state: SessionState): string {
   state.conversationHistory = []
+  state.threadId = null
   return `${ANSI.dim}Conversation history cleared.${ANSI.reset}`
 }
 

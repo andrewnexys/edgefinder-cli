@@ -4,12 +4,14 @@ export interface ChatRequest {
   message: string
   league?: League
   conversationHistory?: Array<{ role: string; content: string }>
+  threadId?: string
 }
 
 export interface ChatResponse {
   response: string
   conversationHistory: Array<{ role: string; content: string }>
   userId: string
+  threadId?: string
   usage?: {
     tokensUsed: number
     promptTokens: number
