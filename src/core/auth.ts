@@ -1,5 +1,5 @@
 import { createInterface } from 'node:readline'
-import { exec } from 'node:child_process'
+import { spawn } from 'node:child_process'
 import { getApiKey, setApiKey, getBaseUrl } from './config.js'
 import { EdgeFinderClient } from './client.js'
 
@@ -23,17 +23,22 @@ function prompt(question: string): Promise<string> {
 }
 
 function openBrowser(url: string): void {
-  const cmd =
-    process.platform === 'darwin'
-      ? 'open'
-      : process.platform === 'win32'
-        ? 'start'
-        : 'xdg-open'
-  exec(`${cmd} "${url}"`, (err) => {
-    if (err) {
-      process.stderr.write(`  Open this URL in your browser:\n  ${url}\n`)
-    }
+  const command = process.platform === 'darwin'
+    ? 'open'
+    : process.platform === 'win32'
+      ? 'cmd'
+      : 'xdg-open'
+  const args = process.platform === 'win32' ? ['/c', 'start', '', url] : [url]
+  const child = spawn(command, args, {
+    detached: true,
+    stdio: 'ignore',
+    shell: false,
   })
+
+  child.on('error', () => {
+    process.stderr.write(`  Open this URL in your browser:\n  ${url}\n`)
+  })
+  child.unref()
 }
 
 function hasPaidAccess(user: {

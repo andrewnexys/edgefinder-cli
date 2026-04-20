@@ -1,8 +1,276 @@
-import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
-import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
-import { z } from 'zod'
 import { EdgeFinderClient, EdgeFinderError } from '../core/client.js'
 import { getApiKey, getBaseUrl } from '../core/config.js'
+
+type JsonRpcId = string | number | null
+type JsonObject = Record<string, unknown>
+type ToolContent = { type: 'text'; text: string }
+type ToolCallResult = { content: ToolContent[]; isError?: boolean }
+type League = 'nfl' | 'nba'
+type PortfolioLeague = League | 'all'
+type JsonSchema = {
+  type?: string
+  enum?: string[]
+  description?: string
+  default?: unknown
+  properties?: Record<string, JsonSchema>
+  required?: string[]
+  additionalProperties?: boolean
+}
+
+class SchemaBuilder {
+  constructor(
+    private readonly schema: JsonSchema,
+    private readonly required = true
+  ) {}
+
+  optional(): SchemaBuilder {
+    return new SchemaBuilder(this.schema, false)
+  }
+
+  default(value: unknown): SchemaBuilder {
+    return new SchemaBuilder({ ...this.schema, default: value }, false)
+  }
+
+  describe(description: string): SchemaBuilder {
+    return new SchemaBuilder({ ...this.schema, description }, this.required)
+  }
+
+  toSchema(): JsonSchema {
+    return this.schema
+  }
+
+  isRequired(): boolean {
+    return this.required
+  }
+}
+
+const z = {
+  string: () => new SchemaBuilder({ type: 'string' }),
+  number: () => new SchemaBuilder({ type: 'number' }),
+  enum: <T extends string>(values: readonly T[]) => new SchemaBuilder({ type: 'string', enum: [...values] }),
+}
+
+type ToolInputSpec = Record<string, SchemaBuilder>
+
+type ToolDefinition = {
+  name: string
+  description: string
+  inputSchema: JsonSchema
+  applyDefaults: (args: JsonObject) => JsonObject
+  handler: (args: JsonObject) => Promise<ToolCallResult>
+}
+
+function buildInputSchema(inputSpec: ToolInputSpec): JsonSchema {
+  const properties: Record<string, JsonSchema> = {}
+  const required: string[] = []
+
+  for (const [key, builder] of Object.entries(inputSpec)) {
+    properties[key] = builder.toSchema()
+    if (builder.isRequired()) {
+      required.push(key)
+    }
+  }
+
+  return {
+    type: 'object',
+    properties,
+    required,
+    additionalProperties: false,
+  }
+}
+
+function applySchemaDefaults(inputSpec: ToolInputSpec, args: JsonObject): JsonObject {
+  const nextArgs = { ...args }
+
+  for (const [key, builder] of Object.entries(inputSpec)) {
+    const schema = builder.toSchema()
+    if (!(key in nextArgs) && 'default' in schema) {
+      nextArgs[key] = schema.default
+    }
+  }
+
+  return nextArgs
+}
+
+function isJsonObject(value: unknown): value is JsonObject {
+  return typeof value === 'object' && value !== null && !Array.isArray(value)
+}
+
+class StdioServerTransport {
+  private buffer = ''
+  onmessage?: (message: JsonObject) => void
+  onerror?: (error: Error) => void
+
+  async start(): Promise<void> {
+    process.stdin.setEncoding('utf8')
+    process.stdin.on('data', (chunk: string) => {
+      this.buffer += chunk
+      this.processBuffer()
+    })
+    process.stdin.on('error', (error) => this.onerror?.(error))
+    process.stdin.resume()
+  }
+
+  async send(message: JsonObject): Promise<void> {
+    process.stdout.write(`${JSON.stringify(message)}\n`)
+  }
+
+  private processBuffer(): void {
+    while (true) {
+      const newlineIndex = this.buffer.indexOf('\n')
+      if (newlineIndex === -1) return
+
+      const line = this.buffer.slice(0, newlineIndex).replace(/\r$/, '')
+      this.buffer = this.buffer.slice(newlineIndex + 1)
+      if (!line.trim()) continue
+
+      try {
+        const parsed = JSON.parse(line) as unknown
+        if (isJsonObject(parsed)) {
+          this.onmessage?.(parsed)
+        }
+      } catch (error) {
+        this.onerror?.(error instanceof Error ? error : new Error(String(error)))
+      }
+    }
+  }
+}
+
+class McpServer {
+  private readonly tools = new Map<string, ToolDefinition>()
+
+  constructor(private readonly serverInfo: { name: string; version: string }) {}
+
+  tool<TArgs extends JsonObject>(
+    name: string,
+    description: string,
+    inputSpec: ToolInputSpec,
+    handler: (args: TArgs) => Promise<ToolCallResult>
+  ): void {
+    this.tools.set(name, {
+      name,
+      description,
+      inputSchema: buildInputSchema(inputSpec),
+      applyDefaults: (args) => applySchemaDefaults(inputSpec, args),
+      handler: (args) => handler(args as TArgs),
+    })
+  }
+
+  async connect(transport: StdioServerTransport): Promise<void> {
+    transport.onmessage = (message) => {
+      this.handleMessage(transport, message).catch((error) => {
+        transport.onerror?.(error instanceof Error ? error : new Error(String(error)))
+      })
+    }
+    transport.onerror = (error) => {
+      process.stderr.write(`MCP transport error: ${error.message}\n`)
+    }
+    await transport.start()
+  }
+
+  private async handleMessage(transport: StdioServerTransport, message: JsonObject): Promise<void> {
+    const id = this.getMessageId(message)
+    const method = typeof message.method === 'string' ? message.method : null
+
+    if (!method) {
+      if (id !== undefined) {
+        await this.sendError(transport, id, -32600, 'Invalid Request')
+      }
+      return
+    }
+
+    if (method.startsWith('notifications/')) {
+      return
+    }
+
+    if (id === undefined) {
+      return
+    }
+
+    try {
+      switch (method) {
+        case 'initialize':
+          await transport.send({
+            jsonrpc: '2.0',
+            id,
+            result: {
+              protocolVersion: this.getRequestedProtocolVersion(message),
+              capabilities: { tools: {} },
+              serverInfo: this.serverInfo,
+            },
+          })
+          return
+        case 'ping':
+          await transport.send({ jsonrpc: '2.0', id, result: {} })
+          return
+        case 'tools/list':
+          await transport.send({
+            jsonrpc: '2.0',
+            id,
+            result: {
+              tools: [...this.tools.values()].map((tool) => ({
+                name: tool.name,
+                description: tool.description,
+                inputSchema: tool.inputSchema,
+              })),
+            },
+          })
+          return
+        case 'tools/call':
+          await this.handleToolCall(transport, id, message)
+          return
+        default:
+          await this.sendError(transport, id, -32601, `Method not found: ${method}`)
+      }
+    } catch (error) {
+      await this.sendError(
+        transport,
+        id,
+        -32603,
+        error instanceof Error ? error.message : String(error)
+      )
+    }
+  }
+
+  private async handleToolCall(transport: StdioServerTransport, id: JsonRpcId, message: JsonObject): Promise<void> {
+    const params = isJsonObject(message.params) ? message.params : {}
+    const name = typeof params.name === 'string' ? params.name : null
+    const tool = name ? this.tools.get(name) : null
+
+    if (!tool) {
+      await this.sendError(transport, id, -32602, 'Unknown tool')
+      return
+    }
+
+    const rawArgs = isJsonObject(params.arguments) ? params.arguments : {}
+    const result = await tool.handler(tool.applyDefaults(rawArgs))
+    await transport.send({ jsonrpc: '2.0', id, result })
+  }
+
+  private getMessageId(message: JsonObject): JsonRpcId | undefined {
+    return typeof message.id === 'string' || typeof message.id === 'number' || message.id === null
+      ? message.id
+      : undefined
+  }
+
+  private getRequestedProtocolVersion(message: JsonObject): string {
+    const params = isJsonObject(message.params) ? message.params : {}
+    return typeof params.protocolVersion === 'string' ? params.protocolVersion : '2024-11-05'
+  }
+
+  private async sendError(
+    transport: StdioServerTransport,
+    id: JsonRpcId,
+    code: number,
+    message: string
+  ): Promise<void> {
+    await transport.send({
+      jsonrpc: '2.0',
+      id,
+      error: { code, message },
+    })
+  }
+}
 
 function formatError(error: unknown): string {
   if (error instanceof EdgeFinderError) {
@@ -53,7 +321,7 @@ export async function startMcpServer(): Promise<void> {
       question: z.string().describe('Your sports analysis question (e.g., "Who should I bet on in tonight\'s NBA games?" or "Give me a breakdown of Chiefs vs Bills")'),
       league: z.enum(['nfl', 'nba']).default('nfl').describe('Which league to analyze'),
     },
-    async ({ question, league }) => {
+    async ({ question, league }: { question: string; league: League }) => {
       try {
         const response = await client.ask({ message: question, league })
         return { content: [{ type: 'text' as const, text: response.response }] }
@@ -72,7 +340,7 @@ export async function startMcpServer(): Promise<void> {
       league: z.enum(['nfl', 'nba']).describe('Which league schedule to retrieve'),
       date: z.string().optional().describe('For NBA: specific date (YYYY-MM-DD). Omit for today\'s games.'),
     },
-    async ({ league, date }) => {
+    async ({ league, date }: { league: League; date?: string }) => {
       try {
         let data: unknown
         if (league === 'nba') {
@@ -95,7 +363,7 @@ export async function startMcpServer(): Promise<void> {
     {
       league: z.enum(['nfl', 'nba']).describe('Which league standings to retrieve'),
     },
-    async ({ league }) => {
+    async ({ league }: { league: League }) => {
       try {
         const data = league === 'nba'
           ? await client.getNBAStandings()
@@ -117,7 +385,7 @@ export async function startMcpServer(): Promise<void> {
       week: z.number().optional().describe('For NFL: specific week number'),
       date: z.string().optional().describe('For NBA: specific date (YYYY-MM-DD)'),
     },
-    async ({ league, week, date }) => {
+    async ({ league, week, date }: { league: League; week?: number; date?: string }) => {
       try {
         let data: unknown
         if (league === 'nba') {
@@ -141,7 +409,7 @@ export async function startMcpServer(): Promise<void> {
       view: z.enum(['summary', 'positions', 'trades']).default('summary').describe('Which portfolio view to retrieve'),
       league: z.enum(['nfl', 'nba', 'all']).default('all').describe('Filter by league'),
     },
-    async ({ view, league }) => {
+    async ({ view, league }: { view: 'summary' | 'positions' | 'trades'; league: PortfolioLeague }) => {
       try {
         let data: unknown
         const leagueParam = league === 'all' ? undefined : league
@@ -169,7 +437,7 @@ export async function startMcpServer(): Promise<void> {
       view: z.enum(['open', 'trade', 'closed']).default('open').describe('Which portfolio tab to search: open positions, trade history, or closed positions'),
       league: z.enum(['nfl', 'nba', 'all']).default('all').describe('Filter by league'),
     },
-    async ({ search, view, league }) => {
+    async ({ search, view, league }: { search: string; view: 'open' | 'trade' | 'closed'; league: PortfolioLeague }) => {
       try {
         const leagueParam = league === 'all' ? undefined : league
         const searchLower = search.toLowerCase()

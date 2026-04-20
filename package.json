@@ -1,6 +1,6 @@
 {
   "name": "@edgefinder/cli",
-  "version": "0.1.15",
+  "version": "0.1.16",
   "description": "EdgeFinder CLI and MCP server for sports analysis",
   "type": "module",
   "bin": {
@@ -19,9 +19,7 @@
     "prepublishOnly": "npm run build"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.12.1",
-    "commander": "^13.1.0",
-    "zod": "^3.25.76"
+    "commander": "^13.1.0"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
