@@ -5,8 +5,8 @@ type JsonRpcId = string | number | null
 type JsonObject = Record<string, unknown>
 type ToolContent = { type: 'text'; text: string }
 type ToolCallResult = { content: ToolContent[]; isError?: boolean }
-type League = 'nfl' | 'nba'
-type PortfolioLeague = League | 'all'
+type League = 'nfl' | 'nba' | 'mlb'
+type PortfolioLeague = 'nfl' | 'nba' | 'all'
 type JsonSchema = {
   type?: string
   enum?: string[]
@@ -316,10 +316,10 @@ export async function startMcpServer(): Promise<void> {
 
   server.tool(
     'ask',
-    'Ask EdgeFinder for NFL or NBA sports analysis — betting recommendations, player stats, matchup breakdowns, odds analysis, injury reports, and more. This is a powerful AI-powered sports analyst.',
+    'Ask EdgeFinder for NFL, NBA, or MLB sports analysis — betting recommendations, player stats, matchup breakdowns, odds analysis, injury reports, and more. This is a powerful AI-powered sports analyst.',
     {
       question: z.string().describe('Your sports analysis question (e.g., "Who should I bet on in tonight\'s NBA games?" or "Give me a breakdown of Chiefs vs Bills")'),
-      league: z.enum(['nfl', 'nba']).default('nfl').describe('Which league to analyze'),
+      league: z.enum(['nfl', 'nba', 'mlb']).default('nfl').describe('Which league to analyze'),
     },
     async ({ question, league }: { question: string; league: League }) => {
       try {

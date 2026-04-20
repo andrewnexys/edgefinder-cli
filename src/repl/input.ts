@@ -14,6 +14,7 @@ const SLASH_COMMANDS: SlashCommand[] = [
   { name: '/status', desc: 'Check subscription status' },
   { name: '/nfl', desc: 'Switch to NFL' },
   { name: '/nba', desc: 'Switch to NBA' },
+  { name: '/mlb', desc: 'Switch to MLB' },
   { name: '/clear', desc: 'Clear conversation history' },
   { name: '/help', desc: 'Show all commands' },
   { name: '/logout', desc: 'Log out and exit' },
@@ -21,7 +22,7 @@ const SLASH_COMMANDS: SlashCommand[] = [
 ]
 
 const NO_ARG_COMMANDS = new Set([
-  '/status', '/nfl', '/nba', '/clear', '/help', '/logout', '/quit',
+  '/status', '/nfl', '/nba', '/mlb', '/clear', '/help', '/logout', '/quit',
 ])
 
 const E = {

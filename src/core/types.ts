@@ -1,4 +1,4 @@
-export type League = 'nfl' | 'nba'
+export type League = 'nfl' | 'nba' | 'mlb'
 
 export interface ChatRequest {
   message: string

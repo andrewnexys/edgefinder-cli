@@ -8,10 +8,11 @@ export const askCommand = new Command('ask')
   .argument('<question>', 'Your sports analysis question')
   .option('--nba', 'Query NBA (default is NFL)')
   .option('--nfl', 'Query NFL (default)')
+  .option('--mlb', 'Query MLB')
   .option('--json', 'Output raw JSON')
-  .action(async (question: string, opts: { nba?: boolean; nfl?: boolean; json?: boolean }) => {
+  .action(async (question: string, opts: { nba?: boolean; nfl?: boolean; mlb?: boolean; json?: boolean }) => {
     try {
-      const league: League = opts.nba ? 'nba' : 'nfl'
+      const league: League = opts.mlb ? 'mlb' : opts.nba ? 'nba' : 'nfl'
 
       const client = await ensureAuthenticated()
 

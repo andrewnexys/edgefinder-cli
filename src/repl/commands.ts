@@ -21,9 +21,15 @@ const ANSI = {
 
 function resolveLeague(state: SessionState, args: string): League {
   const arg = args.trim().toLowerCase()
+  if (arg === 'mlb') return 'mlb'
   if (arg === 'nba') return 'nba'
   if (arg === 'nfl') return 'nfl'
   return state.league
+}
+
+function unsupportedDiscoverLeague(league: League, command: string): string | null {
+  if (league !== 'mlb') return null
+  return `${ANSI.yellow}${command} is not available for MLB in the CLI yet.${ANSI.reset}\n${ANSI.dim}Use /mlb and ask a question directly for MLB analysis.${ANSI.reset}`
 }
 
 function formatError(error: unknown): string {
@@ -67,6 +73,8 @@ async function handleAsk(state: SessionState, question: string): Promise<string>
 async function handleOdds(state: SessionState, args: string): Promise<string> {
   try {
     const league = resolveLeague(state, args)
+    const unsupported = unsupportedDiscoverLeague(league, '/odds')
+    if (unsupported) return unsupported
     const data = league === 'nba'
       ? await state.client.getNBAOdds()
       : await state.client.getNFLOdds()
@@ -79,6 +87,8 @@ async function handleOdds(state: SessionState, args: string): Promise<string> {
 async function handleSchedule(state: SessionState, args: string): Promise<string> {
   try {
     const league = resolveLeague(state, args)
+    const unsupported = unsupportedDiscoverLeague(league, '/schedule')
+    if (unsupported) return unsupported
     const data = league === 'nba'
       ? await state.client.getNBASchedule()
       : await state.client.getNFLSchedule()
@@ -91,6 +101,8 @@ async function handleSchedule(state: SessionState, args: string): Promise<string
 async function handleStandings(state: SessionState, args: string): Promise<string> {
   try {
     const league = resolveLeague(state, args)
+    const unsupported = unsupportedDiscoverLeague(league, '/standings')
+    if (unsupported) return unsupported
     const data = league === 'nba'
       ? await state.client.getNBAStandings()
       : await state.client.getNFLStandings()
@@ -167,6 +179,7 @@ function handleHelp(state: SessionState): string {
     `  ${ANSI.cyan}/status${ANSI.reset}             Check subscription status`,
     `  ${ANSI.cyan}/nfl${ANSI.reset}                Switch to NFL`,
     `  ${ANSI.cyan}/nba${ANSI.reset}                Switch to NBA`,
+    `  ${ANSI.cyan}/mlb${ANSI.reset}                Switch to MLB`,
     `  ${ANSI.cyan}/clear${ANSI.reset}              Clear conversation history`,
     `  ${ANSI.cyan}/help${ANSI.reset}               Show this help`,
     `  ${ANSI.cyan}/logout${ANSI.reset}             Log out and exit`,
@@ -194,6 +207,7 @@ commands.set('portfolio', { handler: (s, a) => handlePortfolio(s, a) })
 commands.set('status', { handler: (s) => handleStatus(s) })
 commands.set('nfl', { handler: (s) => handleLeagueSwitch(s, 'nfl') })
 commands.set('nba', { handler: (s) => handleLeagueSwitch(s, 'nba') })
+commands.set('mlb', { handler: (s) => handleLeagueSwitch(s, 'mlb') })
 commands.set('clear', { handler: (s) => handleClear(s) })
 commands.set('help', { handler: (s) => handleHelp(s) })
 

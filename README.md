@@ -1,6 +1,6 @@
 # @edgefinder/cli
 
-CLI and MCP server for [EdgeFinder](https://edgefinder.io) sports analysis. Get AI-powered NFL and NBA betting recommendations, player stats, odds, schedules, and Polymarket portfolio tracking from your terminal or AI agent.
+CLI and MCP server for [EdgeFinder](https://edgefinder.io) sports analysis. Get AI-powered NFL, NBA, and MLB betting recommendations, player stats, odds, schedules, and Polymarket portfolio tracking from your terminal or AI agent.
 
 ## Requirements
 
@@ -46,6 +46,7 @@ edgefinder config set api-key ef_live_...
 # AI-powered analysis
 edgefinder ask "Who should I bet on tonight?"         # NFL (default)
 edgefinder ask --nba "Lakers vs Celtics prediction"   # NBA
+edgefinder ask --mlb "Yankees vs Red Sox prediction"  # MLB
 
 # Schedules and scores
 edgefinder schedule nfl
