@@ -70,6 +70,10 @@ edgefinder status
 
 All commands support `--json` for machine-readable output.
 
+### Interactive Mode
+
+Run `edgefinder` without a subcommand to start an interactive session. Use `/nfl`, `/nba`, or `/mlb` to switch the active league before asking follow-up questions.
+
 ## MCP Server
 
 Use EdgeFinder as a tool in AI agents like Claude Desktop, Openclaw, or any MCP-compatible client.
@@ -96,7 +100,7 @@ Add to your MCP client config:
 
 | Tool | Description |
 |------|-------------|
-| `ask` | AI sports analysis -- betting picks, player stats, matchups |
+| `ask` | AI sports analysis for NFL, NBA, or MLB -- betting picks, player stats, matchups |
 | `get_schedule` | Game schedules and scores |
 | `get_standings` | League standings |
 | `get_odds` | Polymarket betting odds |
