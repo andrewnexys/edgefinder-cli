@@ -40,11 +40,14 @@ function hasPaidAccess(user: {
   subscriptionPlan: string | null
   subscriptionStatus: string | null
   hasUnlimitedAccess: boolean
+  trialEndsAt?: string | null
   stripeCurrentPeriodEnd: string | null
 }): boolean {
   if (user.hasUnlimitedAccess) return true
   if (!user.subscriptionPlan || !PAID_PLANS.has(user.subscriptionPlan)) return false
-  return user.subscriptionStatus === 'active'
+  if (user.subscriptionStatus === 'active') return true
+  if (user.subscriptionStatus !== 'trialing') return false
+  return !user.trialEndsAt || Date.now() < new Date(user.trialEndsAt).getTime()
 }
 
 async function pollForAuth(sessionToken: string): Promise<{
@@ -54,6 +57,7 @@ async function pollForAuth(sessionToken: string): Promise<{
     subscriptionPlan: string | null
     subscriptionStatus: string | null
     hasUnlimitedAccess: boolean
+    trialEndsAt: string | null
     stripeCurrentPeriodEnd: string | null
   }
 }> {
@@ -84,7 +88,10 @@ async function pollForSubscription(client: EdgeFinderClient): Promise<boolean> {
       const status = await client.getSubscriptionStatus()
       if (
         status.hasUnlimitedAccess ||
-        (PAID_PLANS.has(status.subscriptionPlan) && status.subscriptionStatus === 'active')
+        (PAID_PLANS.has(status.subscriptionPlan) &&
+          (status.subscriptionStatus === 'active' ||
+            (status.subscriptionStatus === 'trialing' &&
+              (!status.trialEndsAt || Date.now() < new Date(status.trialEndsAt).getTime()))))
       ) {
         return true
       }
