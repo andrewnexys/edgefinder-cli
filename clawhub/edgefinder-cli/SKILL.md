@@ -1,6 +1,6 @@
 ---
 name: edgefinder-cli
-description: Use the EdgeFinder CLI for NFL and NBA analysis, schedules, standings, Polymarket odds, and portfolio lookups from the terminal.
+description: Use the EdgeFinder CLI for NFL, NBA, and MLB analysis, plus NFL/NBA schedules, standings, Polymarket odds, and portfolio lookups from the terminal.
 homepage: https://github.com/andrewnexys/edgefinder-cli
 user-invocable: false
 metadata: {"openclaw":{"homepage":"https://github.com/andrewnexys/edgefinder-cli","requires":{"anyBins":["edgefinder","npx"]},"primaryEnv":"EDGEFINDER_API_KEY","install":[{"id":"node","kind":"node","package":"@edgefinder/cli","bins":["edgefinder"],"label":"Install EdgeFinder CLI"}]}}
@@ -8,7 +8,7 @@ metadata: {"openclaw":{"homepage":"https://github.com/andrewnexys/edgefinder-cli
 
 # EdgeFinder CLI
 
-Use this skill when the user wants NFL or NBA betting analysis, schedules, standings, Polymarket odds, or EdgeFinder portfolio data.
+Use this skill when the user wants NFL, NBA, or MLB betting analysis, NFL/NBA schedules, NFL/NBA standings, NFL/NBA Polymarket odds, or EdgeFinder portfolio data.
 
 ## Setup
 
@@ -26,6 +26,7 @@ For conversational analysis, use `ask`:
 ```bash
 sh {baseDir}/scripts/run.sh ask "Who should I bet on tonight?"
 sh {baseDir}/scripts/run.sh ask --nba "Lakers vs Celtics prediction"
+sh {baseDir}/scripts/run.sh ask --mlb "Yankees vs Red Sox prediction"
 ```
 
 For structured data, prefer JSON output:
@@ -44,7 +45,8 @@ sh {baseDir}/scripts/run.sh status --json
 
 ## Notes
 
-- NFL is the default league unless `--nba` is passed.
+- NFL is the default league unless `--nba` or `--mlb` is passed.
+- MLB is currently available for conversational analysis via `ask --mlb` and interactive mode after `/mlb`. Structured schedule, standings, odds, and portfolio league filters are currently NFL/NBA only.
 - `sh {baseDir}/scripts/run.sh` with no subcommand starts the interactive REPL. In automated agent runs, prefer explicit subcommands.
 - CLI access requires an active paid EdgeFinder subscription. If auth is missing, `sh {baseDir}/scripts/run.sh login` will prompt for email and may open the subscription page.
 - Never print or echo the full API key back to the user.

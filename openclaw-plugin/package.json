@@ -1,7 +1,7 @@
 {
   "name": "@edgefinder/openclaw-plugin",
-  "version": "0.1.1",
-  "description": "OpenClaw plugin that bundles the EdgeFinder CLI skill.",
+  "version": "0.1.2",
+  "description": "OpenClaw plugin that bundles the EdgeFinder CLI skill for NFL, NBA, and MLB analysis.",
   "type": "module",
   "files": [
     "index.js",
@@ -18,7 +18,8 @@
     "edgefinder",
     "sports",
     "nfl",
-    "nba"
+    "nba",
+    "mlb"
   ],
   "license": "MIT",
   "author": "EdgeFinder <support@edgefinder.io>",

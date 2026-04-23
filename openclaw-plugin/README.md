@@ -1,6 +1,6 @@
 # @edgefinder/openclaw-plugin
 
-OpenClaw plugin that bundles the EdgeFinder skill.
+OpenClaw plugin that bundles the EdgeFinder skill for NFL, NBA, and MLB analysis.
 
 ## Install
 
@@ -20,7 +20,7 @@ Restart the OpenClaw gateway after install.
 
 ## What it provides
 
-- The `edgefinder-cli` skill
+- The `edgefinder-cli` skill for NFL, NBA, and MLB analysis
 - A wrapper script that uses the local `edgefinder` binary when available
 - Fallback to `npx -y @edgefinder/cli`
 
