@@ -108,6 +108,10 @@ Add to your MCP client config:
 | `analyze_position` | Analyze a portfolio position -- searches by team/title, runs AI analysis with hold/exit advice, entry assessment, or win/loss post-mortem |
 | `get_status` | Account and subscription status |
 
+## Codex Plugin
+
+This repo is also a [Codex Marketplace](https://www.codex-marketplace.com) plugin. The manifest lives at [`.codex-plugin/plugin.json`](./.codex-plugin/plugin.json) and bundles the EdgeFinder MCP server (`.mcp.json`) plus the [`edgefinder` skill](./skills/edgefinder/SKILL.md). The plugin reads credentials the same way the CLI does — `edgefinder login`, `edgefinder config set api-key`, or `EDGEFINDER_API_KEY` in the plugin environment.
+
 ## OpenClaw Plugin
 
 This repo also includes a local-installable OpenClaw plugin package in [`openclaw-plugin/`](./openclaw-plugin).
