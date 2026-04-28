@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "edgefinder": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@edgefinder/cli",
+        "mcp"
+      ]
+    }
+  }
+}

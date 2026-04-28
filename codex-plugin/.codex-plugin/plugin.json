@@ -1,0 +1,47 @@
+{
+  "name": "edgefinder",
+  "version": "0.1.0",
+  "description": "EdgeFinder sports betting analysis for NFL, NBA, MLB, odds, schedules, standings, and Polymarket portfolios.",
+  "author": {
+    "name": "EdgeFinder",
+    "email": "support@edgefinder.io",
+    "url": "https://edgefinder.io"
+  },
+  "homepage": "https://edgefinder.io",
+  "repository": "https://github.com/andrewnexys/edgefinder-cli",
+  "license": "MIT",
+  "keywords": [
+    "edgefinder",
+    "sports",
+    "betting",
+    "nfl",
+    "nba",
+    "mlb",
+    "polymarket",
+    "mcp"
+  ],
+  "skills": "./skills/",
+  "mcpServers": "./.mcp.json",
+  "interface": {
+    "displayName": "EdgeFinder",
+    "shortDescription": "Sports betting analysis from EdgeFinder.",
+    "longDescription": "Use EdgeFinder to analyze NFL, NBA, and MLB games, schedules, standings, odds, and Polymarket portfolio positions.",
+    "developerName": "EdgeFinder",
+    "category": "Productivity",
+    "capabilities": [
+      "MCP",
+      "Sports Analysis"
+    ],
+    "websiteURL": "https://edgefinder.io",
+    "privacyPolicyURL": "https://edgefinder.io/privacy",
+    "termsOfServiceURL": "https://edgefinder.io/terms",
+    "defaultPrompt": [
+      "Analyze tonight's NBA board.",
+      "Review my Polymarket positions.",
+      "Find NFL betting edges this week."
+    ],
+    "brandColor": "#8557F4",
+    "composerIcon": "./assets/icon.png",
+    "logo": "./assets/logo.png"
+  }
+}
