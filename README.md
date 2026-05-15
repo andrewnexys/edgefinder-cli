@@ -78,7 +78,12 @@ Run `edgefinder` without a subcommand to start an interactive session. Use `/nfl
 
 Use EdgeFinder as a tool in AI agents like Claude Desktop, Openclaw, or any MCP-compatible client.
 
-### Setup
+EdgeFinder supports two MCP connection modes:
+
+- **Local stdio MCP**: run by this CLI package with `npx @edgefinder/cli mcp`. Use this for desktop/local agent clients that can launch a command.
+- **Remote HTTP MCP**: hosted by EdgeFinder at `https://chat.edgefinder.io/api/mcp`. Use this for URL-based connector UIs such as Grok or ChatGPT custom apps/connectors.
+
+### Local stdio setup
 
 Add to your MCP client config:
 
@@ -96,6 +101,30 @@ Add to your MCP client config:
 }
 ```
 
+This mode reads credentials from `EDGEFINDER_API_KEY`, `edgefinder login`, or `edgefinder config set api-key`.
+
+### Remote HTTP setup
+
+For clients that ask for an MCP server URL, use:
+
+```text
+https://chat.edgefinder.io/api/mcp
+```
+
+Tool calls require an EdgeFinder API key. Prefer clients that support request headers:
+
+```text
+Authorization: Bearer YOUR_EDGEFINDER_API_KEY
+```
+
+If a connector UI only accepts a URL and does not provide a way to set headers, use:
+
+```text
+https://chat.edgefinder.io/api/mcp?api_key=YOUR_EDGEFINDER_API_KEY
+```
+
+Use the remote HTTP URL for Grok and ChatGPT because their connector flows connect to a hosted MCP server over HTTPS. The `@edgefinder/cli` package is still useful for local MCP clients, but it does not host a public URL by itself.
+
 ### Available Tools
 
 | Tool | Description |
@@ -107,6 +136,8 @@ Add to your MCP client config:
 | `get_portfolio` | Polymarket portfolio data (summary, positions, trades) |
 | `analyze_position` | Analyze a portfolio position -- searches by team/title, runs AI analysis with hold/exit advice, entry assessment, or win/loss post-mortem |
 | `get_status` | Account and subscription status |
+
+`analyze_position` is currently available in the local stdio MCP server. The hosted remote MCP endpoint currently exposes `ask`, `get_schedule`, `get_standings`, `get_odds`, `get_portfolio`, and `get_status`.
 
 ## Codex Plugin
 
