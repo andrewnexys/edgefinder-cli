@@ -28,6 +28,23 @@ To log out:
 edgefinder logout
 ```
 
+## Security
+
+The CLI stores saved API keys in `~/.edgefinder/config.json` with user-only file
+permissions (`0600`) on Unix-like systems. You can remove the saved key at any
+time with:
+
+```bash
+edgefinder logout
+```
+
+For MCP integrations, prefer passing API keys with an `Authorization: Bearer ...`
+header. Query-string API keys are supported only for connector UIs that cannot
+set headers, because URLs may be recorded in browser history, proxies, or logs.
+
+Please report suspected vulnerabilities through GitHub private vulnerability
+reporting rather than public issues. See [SECURITY.md](./SECURITY.md).
+
 ### Manual Configuration
 
 You can also set your API key directly if you already have one from [chat.edgefinder.io/settings/integrations](https://chat.edgefinder.io/settings/integrations):
