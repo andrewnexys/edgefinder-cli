@@ -1,4 +1,4 @@
-import { Command } from 'commander'
+import { Command } from '../command.js'
 import { EdgeFinderError } from '../../core/client.js'
 import { ensureAuthenticated } from '../../core/auth.js'
 

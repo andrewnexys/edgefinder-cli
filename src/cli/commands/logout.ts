@@ -1,4 +1,4 @@
-import { Command } from 'commander'
+import { Command } from '../command.js'
 import { getApiKey, clearApiKey } from '../../core/config.js'
 
 export const logoutCommand = new Command('logout')

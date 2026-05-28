@@ -1,4 +1,4 @@
-import { Command } from 'commander'
+import { Command } from '../command.js'
 import { setApiKey, setBaseUrl, getConfigSummary } from '../../core/config.js'
 
 export const configCommand = new Command('config')

@@ -18,9 +18,7 @@
     "dev": "tsc --watch",
     "prepublishOnly": "npm run build"
   },
-  "dependencies": {
-    "commander": "^13.1.0"
-  },
+  "dependencies": {},
   "devDependencies": {
     "@types/node": "^18.19.0",
     "typescript": "^5.0.0"

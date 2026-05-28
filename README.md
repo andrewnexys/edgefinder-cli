@@ -30,6 +30,9 @@ edgefinder logout
 
 ## Security
 
+The published CLI has no runtime npm dependencies and does not use dynamic code
+execution such as `eval()` or `new Function()`.
+
 The CLI stores saved API keys in `~/.edgefinder/config.json` with user-only file
 permissions (`0600`) on Unix-like systems. You can remove the saved key at any
 time with:

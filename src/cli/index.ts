@@ -1,4 +1,4 @@
-import { Command } from 'commander'
+import { Command } from './command.js'
 import { askCommand } from './commands/ask.js'
 import { scheduleCommand } from './commands/schedule.js'
 import { oddsCommand } from './commands/odds.js'
@@ -15,7 +15,7 @@ export function createCli(): Command {
   program
     .name('edgefinder')
     .description('EdgeFinder CLI — AI-powered sports analysis from your terminal')
-    .version('0.1.0')
+    .version('0.1.17')
 
   program.addCommand(loginCommand)
   program.addCommand(logoutCommand)
@@ -27,7 +27,7 @@ export function createCli(): Command {
   program.addCommand(configCommand)
   program.addCommand(statusCommand)
 
-  // MCP subcommand is handled in bin.ts before commander parses
+  // MCP subcommand is handled in bin.ts before CLI parsing.
 
   return program
 }
