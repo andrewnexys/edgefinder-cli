@@ -1,4 +1,4 @@
-import { Command } from 'commander'
+import { Command } from '../command.js'
 import { runLoginFlow } from '../../core/auth.js'
 
 export const loginCommand = new Command('login')

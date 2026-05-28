@@ -7,7 +7,7 @@ import { startInteractiveSession } from './repl/session.js'
 const args = process.argv.slice(2)
 
 // If the first argument is "mcp", start the MCP server directly
-// (bypasses commander so stdin/stdout stay clean for stdio transport)
+// so stdin/stdout stay clean for stdio transport.
 if (args[0] === 'mcp') {
   startMcpServer().catch((error) => {
     console.error('MCP server error:', error)
@@ -21,5 +21,8 @@ if (args[0] === 'mcp') {
   })
 } else {
   const program = createCli()
-  program.parse(process.argv)
+  program.parse(process.argv).catch((error) => {
+    console.error('Error:', error instanceof Error ? error.message : error)
+    process.exit(1)
+  })
 }
