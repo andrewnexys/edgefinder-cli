@@ -22,7 +22,7 @@
     "commander": "^13.1.0"
   },
   "devDependencies": {
-    "@types/node": "^22.0.0",
+    "@types/node": "^18.19.0",
     "typescript": "^5.0.0"
   },
   "keywords": [
