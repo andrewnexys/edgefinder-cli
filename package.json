@@ -4,7 +4,7 @@
   "description": "EdgeFinder CLI and MCP server for sports analysis",
   "type": "module",
   "bin": {
-    "edgefinder": "./dist/bin.js"
+    "edgefinder": "dist/bin.js"
   },
   "main": "./dist/bin.js",
   "types": "./dist/bin.d.ts",
@@ -38,7 +38,7 @@
   "homepage": "https://edgefinder.io",
   "repository": {
     "type": "git",
-    "url": "https://github.com/andrewnexys/edgefinder-cli.git"
+    "url": "git+https://github.com/andrewnexys/edgefinder-cli.git"
   },
   "bugs": {
     "url": "https://github.com/andrewnexys/edgefinder-cli/issues"
