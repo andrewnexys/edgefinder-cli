@@ -3,7 +3,7 @@ name: edgefinder-cli
 description: Use the EdgeFinder CLI for NFL, NBA, and MLB analysis, plus NFL/NBA schedules, standings, Polymarket odds, and portfolio lookups from the terminal.
 homepage: https://github.com/andrewnexys/edgefinder-cli
 user-invocable: false
-metadata: {"openclaw":{"homepage":"https://github.com/andrewnexys/edgefinder-cli","requires":{"anyBins":["edgefinder","npx"]},"primaryEnv":"EDGEFINDER_API_KEY","install":[{"id":"node","kind":"node","package":"@edgefinder/cli","bins":["edgefinder"],"label":"Install EdgeFinder CLI"}]}}
+metadata: {"openclaw":{"homepage":"https://github.com/andrewnexys/edgefinder-cli","requires":{"bins":["edgefinder"]},"primaryEnv":"EDGEFINDER_API_KEY"}}
 ---
 
 # EdgeFinder CLI
@@ -13,7 +13,7 @@ Use this skill when the user wants NFL, NBA, or MLB betting analysis, NFL/NBA sc
 ## Setup
 
 - Use the bundled wrapper script: `sh {baseDir}/scripts/run.sh ...`
-- The wrapper prefers the installed `edgefinder` binary and falls back to `npx -y @edgefinder/cli`.
+- Install the native binary with `cargo install --git https://github.com/andrewnexys/edgefinder-cli edgefinder-cli`.
 - Authenticate in one of these ways:
   - Set `EDGEFINDER_API_KEY=ef_live_...` in your environment (recommended — add to shell profile or OpenClaw's env config).
   - Run `sh {baseDir}/scripts/run.sh login` for the interactive magic-link flow.

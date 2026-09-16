@@ -21,8 +21,13 @@ Restart the OpenClaw gateway after install.
 ## What it provides
 
 - The `edgefinder-cli` skill for NFL, NBA, and MLB analysis
-- A wrapper script that uses the local `edgefinder` binary when available
-- Fallback to `npx -y @edgefinder/cli`
+- A wrapper script that uses the native `edgefinder` binary on `PATH`
+
+Install the CLI first with:
+
+```bash
+cargo install --git https://github.com/andrewnexys/edgefinder-cli edgefinder-cli
+```
 
 ## Authentication
 
