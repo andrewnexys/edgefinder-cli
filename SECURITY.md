@@ -13,8 +13,7 @@ Do not open a public issue for a suspected vulnerability.
 
 ## Supported Versions
 
-Security fixes are released for the latest published version of
-`@edgefinder/cli`.
+Security fixes are released for the latest version of `edgefinder-cli`.
 
 ## Credential Handling
 
@@ -37,4 +36,4 @@ proxies, or logs.
 
 This repository uses GitHub security features for dependency tracking, secret
 scanning, push protection, and CodeQL analysis. Dependabot is configured to open
-dependency update pull requests for the CLI package and OpenClaw plugin package.
+dependency update pull requests for the Rust CLI and OpenClaw plugin package.

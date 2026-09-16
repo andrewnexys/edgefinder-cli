@@ -10,7 +10,39 @@ permissions:
   contents: read
 
 jobs:
-  build:
+  rust:
+    name: Rust
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+
+      - name: Cache Rust build
+        uses: Swatinem/rust-cache@v2
+
+      - name: Check formatting
+        run: cargo fmt --check
+
+      - name: Lint
+        run: cargo clippy --all-targets --all-features -- -D warnings
+
+      - name: Test
+        run: cargo test --all-targets
+
+      - name: Build release binary
+        run: cargo build --release
+
+  node-compatibility:
+    # Keep this job name stable: main branch protection requires Build (18/20/22).
     name: Build
     runs-on: ubuntu-latest
     strategy:
@@ -30,5 +62,5 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Build
+      - name: Build compatibility package
         run: npm run build

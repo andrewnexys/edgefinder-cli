@@ -1,118 +1,83 @@
-# @edgefinder/cli
+# EdgeFinder CLI
 
-CLI and MCP server for [EdgeFinder](https://edgefinder.io) sports analysis. Get AI-powered NFL, NBA, and MLB betting recommendations, player stats, odds, schedules, and Polymarket portfolio tracking from your terminal or AI agent.
+A native Rust CLI and MCP server for [EdgeFinder](https://edgefinder.io) sports analysis. Get AI-powered NFL, NBA, and MLB analysis, schedules, standings, Polymarket odds, and portfolio data from a terminal or AI agent.
 
-## Requirements
+## Install
 
-- Node.js 18+
-- EdgeFinder subscription (Starter $20/mo, Pro $50/mo, or Ultimate $150/mo)
-
-## Getting Started
+Install Rust 1.88 or newer, then build directly from GitHub:
 
 ```bash
-# Install
-npm install -g @edgefinder/cli
+cargo install --git https://github.com/andrewnexys/edgefinder-cli edgefinder-cli
+```
 
-# Log in (opens magic link in your email)
+For local development:
+
+```bash
+git clone https://github.com/andrewnexys/edgefinder-cli.git
+cd edgefinder-cli
+cargo install --path .
+```
+
+CLI access requires an EdgeFinder Starter, Pro, or Ultimate subscription.
+
+## Sign in
+
+```bash
 edgefinder login
-
-# Start asking questions
 edgefinder ask "Who should I bet on tonight?"
 ```
 
-`edgefinder login` will walk you through everything — enter your email, click the magic link, and if you don't have a subscription yet, it'll open the pricing page in your browser. Once you're set up, your API key is saved automatically.
+The login command sends a magic link and saves the resulting API key to `~/.edgefinder/config.json`. On Unix-like systems, the file is created with `0600` permissions.
 
-To log out:
-
-```bash
-edgefinder logout
-```
-
-## Security
-
-The published CLI has no runtime npm dependencies and does not use dynamic code
-execution such as `eval()` or `new Function()`.
-
-The CLI stores saved API keys in `~/.edgefinder/config.json` with user-only file
-permissions (`0600`) on Unix-like systems. You can remove the saved key at any
-time with:
+You can also configure an existing key:
 
 ```bash
-edgefinder logout
-```
-
-For MCP integrations, prefer passing API keys with an `Authorization: Bearer ...`
-header. Query-string API keys are supported only for connector UIs that cannot
-set headers, because URLs may be recorded in browser history, proxies, or logs.
-
-Please report suspected vulnerabilities through GitHub private vulnerability
-reporting rather than public issues. See [SECURITY.md](./SECURITY.md).
-
-### Manual Configuration
-
-You can also set your API key directly if you already have one from [chat.edgefinder.io/settings/integrations](https://chat.edgefinder.io/settings/integrations):
-
-```bash
-# Environment variable
 export EDGEFINDER_API_KEY=ef_live_...
-
-# Or save to config file (~/.edgefinder/config.json)
+# or
 edgefinder config set api-key ef_live_...
 ```
 
-## CLI Usage
+Use `edgefinder logout` to remove a saved key.
+
+## Commands
 
 ```bash
-# AI-powered analysis
-edgefinder ask "Who should I bet on tonight?"         # NFL (default)
-edgefinder ask --nba "Lakers vs Celtics prediction"   # NBA
-edgefinder ask --mlb "Yankees vs Red Sox prediction"  # MLB
+# AI analysis (NFL is the default)
+edgefinder ask "Who should I bet on tonight?"
+edgefinder ask --nba "Lakers vs Celtics prediction"
+edgefinder ask --mlb "Yankees vs Red Sox prediction"
 
-# Schedules and scores
+# Schedules, odds, and standings
 edgefinder schedule nfl
 edgefinder schedule nba --date 2026-02-20
-
-# Polymarket odds
 edgefinder odds nfl --week 12
 edgefinder odds nba
-
-# Standings
 edgefinder standings nba
 
-# Portfolio tracking (requires connected Polymarket wallet)
+# Polymarket portfolio
 edgefinder portfolio summary
-edgefinder portfolio positions
-edgefinder portfolio trades
+edgefinder portfolio positions --league nba
+edgefinder portfolio trades --limit 20
 
-# Account status
+# Account and configuration
 edgefinder status
+edgefinder config show
 ```
 
-All commands support `--json` for machine-readable output.
+Structured commands support `--json`. Run `edgefinder --help` or `edgefinder <command> --help` for the complete interface.
 
-### Interactive Mode
+Running `edgefinder` with no subcommand starts an interactive session. Use `/nfl`, `/nba`, or `/mlb` to switch leagues while preserving conversation history.
 
-Run `edgefinder` without a subcommand to start an interactive session. Use `/nfl`, `/nba`, or `/mlb` to switch the active league before asking follow-up questions.
+## MCP server
 
-## MCP Server
-
-Use EdgeFinder as a tool in AI agents like Claude Desktop, Openclaw, or any MCP-compatible client.
-
-EdgeFinder supports two MCP connection modes:
-
-- **Local stdio MCP**: run by this CLI package with `npx @edgefinder/cli mcp`. Use this for desktop/local agent clients that can launch a command.
-- **Remote HTTP MCP**: hosted by EdgeFinder at `https://chat.edgefinder.io/api/mcp`. Use this for URL-based connector UIs such as Grok or ChatGPT custom apps/connectors.
-
-### Local stdio setup
-
-Add to your MCP client config:
+The same native binary includes a newline-delimited JSON-RPC stdio MCP server:
 
 ```json
 {
   "mcpServers": {
     "edgefinder": {
-      "command": "npx",
-      "args": ["-y", "@edgefinder/cli", "mcp"],
+      "command": "edgefinder",
+      "args": ["mcp"],
       "env": {
         "EDGEFINDER_API_KEY": "ef_live_..."
       }
@@ -121,63 +86,34 @@ Add to your MCP client config:
 }
 ```
 
-This mode reads credentials from `EDGEFINDER_API_KEY`, `edgefinder login`, or `edgefinder config set api-key`.
-
-### Remote HTTP setup
-
-For clients that ask for an MCP server URL, use:
-
-```text
-https://chat.edgefinder.io/api/mcp
-```
-
-Tool calls require an EdgeFinder API key. Prefer clients that support request headers:
-
-```text
-Authorization: Bearer YOUR_EDGEFINDER_API_KEY
-```
-
-If a connector UI only accepts a URL and does not provide a way to set headers, use:
-
-```text
-https://chat.edgefinder.io/api/mcp?api_key=YOUR_EDGEFINDER_API_KEY
-```
-
-Use the remote HTTP URL for Grok and ChatGPT because their connector flows connect to a hosted MCP server over HTTPS. The `@edgefinder/cli` package is still useful for local MCP clients, but it does not host a public URL by itself.
-
-### Available Tools
+Available tools:
 
 | Tool | Description |
-|------|-------------|
-| `ask` | AI sports analysis for NFL, NBA, or MLB -- betting picks, player stats, matchups |
-| `get_schedule` | Game schedules and scores |
-| `get_standings` | League standings |
-| `get_odds` | Polymarket betting odds |
-| `get_portfolio` | Polymarket portfolio data (summary, positions, trades) |
-| `analyze_position` | Analyze a portfolio position -- searches by team/title, runs AI analysis with hold/exit advice, entry assessment, or win/loss post-mortem |
+| --- | --- |
+| `ask` | NFL, NBA, or MLB sports analysis |
+| `get_schedule` | NFL or NBA schedules and scores |
+| `get_standings` | NFL or NBA standings |
+| `get_odds` | NFL or NBA Polymarket odds |
+| `get_portfolio` | Portfolio summary, positions, or trades |
+| `analyze_position` | AI analysis of an open, traded, or closed position |
 | `get_status` | Account and subscription status |
 
-`analyze_position` is currently available in the local stdio MCP server. The hosted remote MCP endpoint currently exposes `ask`, `get_schedule`, `get_standings`, `get_odds`, `get_portfolio`, and `get_status`.
+For URL-based connector UIs, use the hosted endpoint at `https://chat.edgefinder.io/api/mcp`. Prefer an `Authorization: Bearer ...` header. Query-string API keys are supported only when a connector cannot set headers, because URLs may be logged.
 
-## Codex Plugin
-
-This repo is also a [Codex Marketplace](https://www.codex-marketplace.com) plugin. The manifest lives at [`.codex-plugin/plugin.json`](./.codex-plugin/plugin.json) and bundles the EdgeFinder MCP server (`.mcp.json`) plus the [`edgefinder` skill](./skills/edgefinder/SKILL.md). The plugin reads credentials the same way the CLI does — `edgefinder login`, `edgefinder config set api-key`, or `EDGEFINDER_API_KEY` in the plugin environment.
-
-## OpenClaw Plugin
-
-This repo also includes a local-installable OpenClaw plugin package in [`openclaw-plugin/`](./openclaw-plugin).
-
-Local install:
+## Development
 
 ```bash
-openclaw plugins install /absolute/path/to/openclaw-plugin
+cargo fmt --check
+cargo clippy --all-targets --all-features -- -D warnings
+cargo test --all-targets
+cargo build --release
 ```
 
-OpenClaw can also install it by package name:
+The Rust implementation uses rustls for TLS and does not require OpenSSL at runtime.
 
-```bash
-openclaw plugins install @edgefinder/openclaw-plugin
-```
+## Plugins
+
+The Codex plugin manifest in `.codex-plugin/plugin.json` uses the installed `edgefinder` binary for MCP. The OpenClaw package in `openclaw-plugin/` bundles the corresponding skill and expects the native binary on `PATH`.
 
 ## License
 
