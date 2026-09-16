@@ -42,7 +42,8 @@ jobs:
         run: cargo build --release
 
   node-compatibility:
-    name: Legacy npm compatibility
+    # Keep this job name stable: main branch protection requires Build (18/20/22).
+    name: Build
     runs-on: ubuntu-latest
     strategy:
       matrix:
